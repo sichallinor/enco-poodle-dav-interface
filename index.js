@@ -86,45 +86,47 @@ module.exports =  {
         if(this.debug)  console.log("getItems");
 
         return new Promise(function(resolve, reject) {
+        	try{
+		    	var xhr = new dav.transport.Basic(
+					new dav.Credentials({
+					  username: mode.username,
+					  password: mode.password
+					})
+				);
 
-	    	var xhr = new dav.transport.Basic(
-				new dav.Credentials({
-				  username: mode.username,
-				  password: mode.password
-				})
-			);
-
-	    	var accountProps = {
-				server: mode.urlbase + mode.urlpath,
-				xhr: xhr,
-				loadObjects: true,
-				accountType: mode.apitype
-			};
-			var filters = self.getFiltersFromMode(mode);
-			if(filters) accountProps['filters'] = filters;
-
-
-			dav.createAccount(accountProps).then(function(account) {
-
-                // ADD ITEMS PROPERTY IF IT DOESNT EXIST
-                if(!mode.hasOwnProperty('items')){
-                    mode['items'] = [];
-                }else{
-                    mode.items.length = 0; // TO EMPTY THE ARRAY
-                }
-
-                if(mode.apitype==="caldav"){
-                	self.caldav(account,mode);
-                }else if(mode.apitype==="carddav"){
-                	self.carddav(account,mode);
-                }
-
-                resolve();
-            }, function(err) {
-                reject();
-            });
+		    	var accountProps = {
+					server: mode.urlbase + mode.urlpath,
+					xhr: xhr,
+					loadObjects: true,
+					accountType: mode.apitype
+				};
+				var filters = self.getFiltersFromMode(mode);
+				if(filters) accountProps['filters'] = filters;
 
 
+				dav.createAccount(accountProps).then(function(account) {
+
+	                // ADD ITEMS PROPERTY IF IT DOESNT EXIST
+	                if(!mode.hasOwnProperty('items')){
+	                    mode['items'] = [];
+	                }else{
+	                    mode.items.length = 0; // TO EMPTY THE ARRAY
+	                }
+
+	                if(mode.apitype==="caldav"){
+	                	self.caldav(account,mode);
+	                }else if(mode.apitype==="carddav"){
+	                	self.carddav(account,mode);
+	                }
+
+	                resolve();
+	            }, function(err) {
+	                reject();
+	            });
+        	}catch(err){
+        		console.log("ERROR : ",err);
+        		reject();
+        	}
 
 		});
 
