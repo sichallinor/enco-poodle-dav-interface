@@ -11,7 +11,7 @@ module.exports = {
 		//console.log(vCalFileObjects);
 
 		const dateFormat = /^\d{4}\d{2}\d{2}T\d{2}\d{2}\d{2}/;
-		const reqFormat = 'YYYY-MM-DDThh:mm:ss';
+		const reqFormat = 'YYYY-MM-DDTHH:mm:ss';
 
 		var summaries = [];
 
@@ -55,11 +55,19 @@ module.exports = {
 							if('UID' in vTodo) uid = vTodo['UID'];
 			
 
+							for(prop in vEvent){
+								if(prop.startsWith('DTSTART')) dtstart = this.formatDate(vEvent[prop],dateFormat,reqFormat);
+								if(prop.startsWith('DTEND')) dtend = this.formatDate(vEvent[prop],dateFormat,reqFormat);
+							}
+
+							/*
 							if('DTSTART' in vTodo) dtstart = this.formatDate(vTodo['DTSTART'],dateFormat,reqFormat);
 							if('DTEND' in vTodo) dtend = this.formatDate(vTodo['DTEND'],dateFormat,reqFormat);
 							if('DTSTART;VALUE=DATE' in vTodo) dtstart = this.formatDate(vTodo['DTSTART;VALUE=DATE'],dateFormat,reqFormat);
 							if('DTEND;VALUE=DATE' in vTodo) dtend = this.formatDate(vTodo['DTEND;VALUE=DATE'],dateFormat,reqFormat); 
+							*/
 
+							
 							var summaryObj = { "uid": uid , "summary": summary, "dtstart": dtstart, "dtend": dtend, "calendar": vCalFileObject.calendar_name  };
 							summaries.push(summaryObj);
 
@@ -91,11 +99,17 @@ module.exports = {
 							if('SUMMARY' in vEvent) summary = vEvent['SUMMARY'];
 							if('UID' in vEvent) uid = vEvent['UID'];
 
+							for(prop in vEvent){
+								if(prop.startsWith('DTSTART')) dtstart = this.formatDate(vEvent[prop],dateFormat,reqFormat);
+								if(prop.startsWith('DTEND')) dtend = this.formatDate(vEvent[prop],dateFormat,reqFormat);
+							}
+
+							/*
 							if('DTSTART' in vEvent) dtstart = this.formatDate(vEvent['DTSTART'],dateFormat,reqFormat);
 							if('DTEND' in vEvent) dtend = this.formatDate(vEvent['DTEND'],dateFormat,reqFormat);
 							if('DTSTART;VALUE=DATE' in vEvent) dtstart = this.formatDate(vEvent['DTSTART;VALUE=DATE'],dateFormat,reqFormat);
 							if('DTEND;VALUE=DATE' in vEvent) dtend = this.formatDate(vEvent['DTEND;VALUE=DATE'],dateFormat,reqFormat); 
-
+							*/
 
 
 							var summaryObj = { "uid": uid , "summary": summary, "dtstart": dtstart, "dtend": dtend, "calendar": vCalFileObject.calendar_name  };

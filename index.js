@@ -190,7 +190,8 @@ module.exports =  {
 					//add the display name
 			        output['calendar_name'] = calendarDisplayName
 
-					console.log(output);
+					//console.log("OUTPUT:",output);
+					//console.log("OUTPUT:",output.VCALENDAR[0].VEVENT[0]);
 
 					calendarobjects.push(output);
 

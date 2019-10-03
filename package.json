@@ -1,6 +1,6 @@
 {
   "name": "enco-poodle-dav-interface",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "WebDav,CalDav,CardDav Integration into Enco Project",
   "main": "index.js",
   "scripts": {
