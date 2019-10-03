@@ -87,12 +87,14 @@ module.exports =  {
 
         return new Promise(function(resolve, reject) {
         	try{
+
 		    	var xhr = new dav.transport.Basic(
 					new dav.Credentials({
 					  username: mode.username,
 					  password: mode.password
 					})
 				);
+
 
 		    	var accountProps = {
 					server: mode.urlbase + mode.urlpath,
@@ -121,10 +123,11 @@ module.exports =  {
 
 	                resolve();
 	            }, function(err) {
+	            	console.log("ERROR MSG : ",err.message);
 	                reject();
 	            });
         	}catch(err){
-        		console.log("ERROR : ",err);
+        		console.log("ERROR : ",err.message);
         		reject();
         	}
 
@@ -222,13 +225,6 @@ module.exports =  {
 			}
 		}
     }
-
-
-
-
-
-
-
 
 
 }
