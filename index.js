@@ -85,8 +85,32 @@ module.exports =  {
 
         if(this.debug)  console.log("getItems");
 
+        return this.populateItems(mode,mode.items);
+
+	
+    },
+
+    getItem(mode=null) {
+    	if(mode) this.setMode(mode)
+    	mode = this.getMode();
+    	//------------------------
+
+    	if(!this.requireModePropertiesOrError(['username','password','urlbase','urlpath','port','apitype','identity'])){
+    		throw "ERROR : MISSING PROPERTIES";
+    	}
+
+        if(this.debug)  console.log("getItem");
+        
+        return this.populateItems(mode,mode.models);
+
+
+    },
+
+
+    populateItems(mode,destiation_arr){
+    	var self = this;
         return new Promise(function(resolve, reject) {
-        	try{
+	    	try{
 
 		    	var xhr = new dav.transport.Basic(
 					new dav.Credentials({
@@ -94,8 +118,7 @@ module.exports =  {
 					  password: mode.password
 					})
 				);
-
-
+		    	//-------------------------------
 		    	var accountProps = {
 					server: mode.urlbase + mode.urlpath,
 					xhr: xhr,
@@ -104,8 +127,8 @@ module.exports =  {
 				};
 				var filters = self.getFiltersFromMode(mode);
 				if(filters) accountProps['filters'] = filters;
-
-
+				//-------------------------------
+				//dav.debug.enabled = true;
 				dav.createAccount(accountProps).then(function(account) {
 
 	                // ADD ITEMS PROPERTY IF IT DOESNT EXIST
@@ -115,30 +138,53 @@ module.exports =  {
 	                    mode.items.length = 0; // TO EMPTY THE ARRAY
 	                }
 
+	                var results = [];
 	                if(mode.apitype==="caldav"){
-	                	self.caldav(account,mode);
+	                	results = self.getCalDavObjects(account,mode);
 	                }else if(mode.apitype==="carddav"){
-	                	self.carddav(account,mode);
+	                	results = self.getCardDavObjects(account,mode);
 	                }
+	                //PUSH RESULTS TO DESTINATION ARRAY
+	                destiation_arr.push(...results);
 
 	                resolve();
 	            }, function(err) {
 	            	console.log("ERROR MSG : ",err.message);
 	                reject();
 	            });
-        	}catch(err){
-        		console.log("ERROR : ",err.message);
-        		reject();
-        	}
-
-		});
-
-		
-
+	    	}catch(err){
+	    		console.log("ERROR : ",err.message);
+	    		reject();
+	    	}
+        });
     },
 
+
     getFiltersFromMode(mode){
-    	return null;
+
+    	if(mode.hasOwnProperty('identity')){
+
+			return [{
+				type: 'comp-filter',
+				attrs: { name: 'VCALENDAR' },
+				children: [{
+				  type: 'comp-filter',
+				  attrs: { name: 'VEVENT' },
+				  children: [{
+				    type: 'prop-filter',
+				    attrs: { name: 'UID' },
+				    children: [{
+				      type: 'text-match',
+				      value: mode.identity
+				  	}]
+				   }]
+
+				}]
+			}]
+
+    	}
+
+    	//return null;
     	/*
 		return [{
 			type: 'comp-filter',
@@ -153,9 +199,11 @@ module.exports =  {
 			}]
 		}]
 		*/
+
+		
     },
 
-    caldav(account,mode){
+    getCalDavObjects(account,mode){
     	var calendarobjects = [];
 
 		var calendars = account.calendars;
@@ -202,12 +250,16 @@ module.exports =  {
 		//----------------------------
 		// CHOOSE TO PUSH EITHER (1) the raw data (2) the json object (3) the summary
 		var summaries = summary.summary(calendarobjects);
-		mode.items.push(...summaries);  
+		return summaries;
+
+		//mode.items.push(...summaries);  
 
     },
 
-    carddav(account,mode){
-		let addressbooks = account.addressBooks;
+    getCardDavObjects(account,mode){
+    	var cardobjects = [];
+
+		var addressbooks = account.addressBooks;
 
         //console.log("-------------------------------");
         //console.log("ADD LEN:",addressbooks.length);
@@ -221,10 +273,11 @@ module.exports =  {
 				let object = objects[y];
 				if(object.hasOwnProperty('data')){
 					//console.log(objects[y].data);
-					mode.items.push(objects[y].data.props);  
+					cardobjects.push(objects[y].data.props);  
 				}
 			}
 		}
+		return cardobjects;
     }
 
 
