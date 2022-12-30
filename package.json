@@ -23,7 +23,7 @@
   "homepage": "https://github.com/sichallinor/enco-poodle-dav-interface#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.2.1"
+    "mocha": "^10.2.0"
   },
   "dependencies": {
     "dav": "^1.8.0",
